@@ -1,0 +1,7 @@
+.venv/
+.claude/
+
+data/
+
+encoders/esm2_650M/
+backup/

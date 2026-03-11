@@ -1,0 +1,37 @@
+{
+    "seed":        42,
+    "results_dir": "results",
+
+    "s1_allele_aa_path":          "data/allele_to_aa.json",
+    "s1_pretrained_mae_dir":      "results/mae_pretrained",
+    "s1_embed_dim":               128,
+    "s1_nhead":                   8,
+    "s1_num_layers":              4,
+    "s1_output_dim":              256,
+    "s1_dropout":                 0.1,
+    "s1_epochs":                  200,
+    "s1_batch_size":              64,
+    "s1_lr":                      1e-3,
+    "s1_lr_patience":             5,
+    "s1_lr_factor":               0.5,
+    "s1_min_lr":                  1e-5,
+    "s1_early_stop_patience":     10,
+    "s1_mask_ratio":              0.15,
+    "s1_val_fraction":            0.1,
+
+    "s2_csv_path":                "data/Epitope_MHC_Restriction.csv",
+    "s2_pep_embed_cache":         "data/peptide_embeddings_cache.pt",
+    "s2_test_split_path":         "data/test_split.pt",
+    "s2_peptide_dim":             1280,
+    "s2_peptides_per_batch":      10000,
+    "s2_val_fraction":            0.1,
+    "s2_test_fraction":           0.1,
+    "s2_n_epochs_final":          30,
+    "s2_early_stop_patience":     7,
+    "s2_output_dim":              128,
+    "s2_lr":                      1e-4,
+    "s2_dropout":                 0.1,
+    "s2_init_temp":               0.1,
+
+    "eval_k_values":              [10, 50, 100]
+}
