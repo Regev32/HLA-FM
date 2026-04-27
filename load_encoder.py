@@ -49,26 +49,27 @@ def load_encoder(stage: str, device: str = None) -> MHCAttentionEncoder:
 
     ckpt_path = CHECKPOINTS[stage]
     if not os.path.exists(ckpt_path):
-        script = "pretrain_mae.py" if stage == "stage1" else "train_mhc.py"
+        script = "pretrain.py" if stage == "stage1" else "peptide_mhc.py"
         raise FileNotFoundError(
             f"No checkpoint found at {ckpt_path}. Run {script} first."
         )
 
     ckpt = torch.load(ckpt_path, map_location=device)
 
-    # Stage 1 saves arch in the checkpoint.
-    # Stage 2 doesn't, so we read the backbone arch from config and infer
-    # output_dim from the saved projection weight shape.
-    arch       = ckpt.get("arch", {"embed_dim": CFG["s1_embed_dim"], "nhead": CFG["s1_nhead"], "num_layers": CFG["s1_num_layers"], "output_dim": CFG["s1_output_dim"], "dropout": CFG["s1_dropout"]})
-    output_dim = ckpt["mhc_encoder"]["proj.weight"].shape[0]
+    arch        = ckpt.get("arch", {"embed_dim": CFG["s1_embed_dim"], "nhead": CFG["s1_nhead"],
+                                    "num_layers": CFG["s1_num_layers"], "output_dim": CFG["s1_output_dim"],
+                                    "dropout": CFG["s1_dropout"]})
+    output_dim  = ckpt.get("output_dim", arch.get("output_dim", CFG["s1_output_dim"]))
+    proj_layers = ckpt.get("proj_layers", 1)
 
     encoder = MHCAttentionEncoder(
-        vocab_size = 23,
-        embed_dim  = arch["embed_dim"],
-        nhead      = arch["nhead"],
-        num_layers = arch["num_layers"],
-        output_dim = output_dim,
-        dropout    = arch.get("dropout", 0.1),
+        vocab_size  = 23,
+        embed_dim   = arch["embed_dim"],
+        nhead       = arch["nhead"],
+        num_layers  = arch["num_layers"],
+        output_dim  = output_dim,
+        dropout     = arch.get("dropout", 0.1),
+        proj_layers = proj_layers,
     ).to(device)
 
     encoder.load_state_dict(ckpt["mhc_encoder"])

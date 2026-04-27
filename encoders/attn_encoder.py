@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from encoders.utils import PAD_IDX, _tokenize
+from encoders.utils import PAD_IDX, _tokenize, build_mlp
 
 # Safe upper bound for positional encoding (max MHC protein length ~379 + CLS)
 MAX_POS = 512
@@ -13,6 +13,7 @@ DEFAULTS = dict(
     num_layers = 4,
     output_dim = 256,
     dropout    = 0.1,
+    proj_layers = 1,
 )
 
 
@@ -25,6 +26,7 @@ class MHCAttentionEncoder(nn.Module):
         num_layers = cfg["num_layers"]
         output_dim = cfg["output_dim"]
         dropout    = cfg["dropout"]
+        proj_layers = cfg["proj_layers"]
 
         super().__init__()
         self.embed_dim = embed_dim  # exposed for external callers (e.g. MAE decoder)
@@ -40,8 +42,8 @@ class MHCAttentionEncoder(nn.Module):
             dropout         = dropout,
             batch_first     = True,
         )
-        self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
-        self.proj = nn.Linear(embed_dim, output_dim)
+        self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=num_layers, enable_nested_tensor=False)
+        self.proj = build_mlp(embed_dim, output_dim, proj_layers, dropout)
 
     def forward(self, x: torch.Tensor, return_sequence: bool = False) -> torch.Tensor:
         """

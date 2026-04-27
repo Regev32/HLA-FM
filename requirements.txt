@@ -1,5 +1,0 @@
-transformers
-torch
-pandas
-optuna
-matplotlib

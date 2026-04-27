@@ -5,3 +5,10 @@ data/
 
 encoders/esm2_650M/
 backup/
+
+.DS_Store
+
+.git/
+
+__pycache__/
+**/__pycache__/
