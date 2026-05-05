@@ -1,11 +1,13 @@
 .venv/
 .claude/
-
+.idea/
 data/
 
 encoders/esm2_650M/
+encoders/tcrbert/
 backup/
 
+CLAUDE.md
 .DS_Store
 
 .git/

@@ -11,18 +11,20 @@ Usage:
 import json
 import os
 import sys
+from pathlib import Path
 
 import torch
 
-sys.path.insert(0, os.path.dirname(__file__))
+ROOT = Path(__file__).parent
+sys.path.insert(0, str(ROOT))
 from encoders.attn_encoder import MHCAttentionEncoder
 
-with open("config/train_config.json") as f:
+with open(ROOT / "config/train_config.json") as f:
     CFG = json.load(f)
 
 CHECKPOINTS = {
     "stage1": os.path.join(CFG["s1_pretrained_mae_dir"], "mae_pretrained.pt"),
-    "stage2": os.path.join(CFG["results_dir"], "attn", "best_model.pt"),
+    "stage2": os.path.join(CFG["finetune_results_dir"], "peptide_mhc", "attn", "best_model.pt"),
 }
 
 
@@ -49,9 +51,9 @@ def load_encoder(stage: str, device: str = None) -> MHCAttentionEncoder:
 
     ckpt_path = CHECKPOINTS[stage]
     if not os.path.exists(ckpt_path):
-        script = "pretrain.py" if stage == "stage1" else "peptide_mhc.py"
+        script = "python main.py pretrain" if stage == "stage1" else "python main.py finetune --task peptide_mhc"
         raise FileNotFoundError(
-            f"No checkpoint found at {ckpt_path}. Run {script} first."
+            f"No checkpoint found at {ckpt_path}. Run `{script}` first."
         )
 
     ckpt = torch.load(ckpt_path, map_location=device)
