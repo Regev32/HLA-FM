@@ -48,5 +48,11 @@
     "s2_dropout":                 0.1,
     "s2_temp":                    0.9,
 
-    "eval_k_values":              [10, 50, 100]
+    "eval_k_values":              [10, 50, 100],
+
+    "s2_tcr_csv_path":            "data/finetune/mhc_tcr/mhc_tcr_bond_tcrbert.csv",
+    "s2_tcr_embed_cache":         "data/finetune/mhc_tcr/tcr_embeddings_cache.pt",
+    "s2_tcr_dim":                 768,
+    "s2_tcr_test_split_path":     "data/finetune/mhc_tcr/test_split.pt",
+    "s2_tcr_per_batch":           2048
 }
