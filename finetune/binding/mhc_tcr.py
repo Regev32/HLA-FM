@@ -22,6 +22,7 @@ class MHCTCRTask(BindingTask):
     query_dim       = CFG["s2_tcr_dim"]
     batch_size      = CFG["s2_tcr_per_batch"]
     test_split_path = CFG["s2_tcr_test_split_path"]
+    eval_k_values   = [5, 10, 20]
 
     def load_data(self) -> tuple:
         df = pd.read_csv(CFG["s2_tcr_csv_path"]).dropna(subset=["tcrbert_input", "hla_seq"])

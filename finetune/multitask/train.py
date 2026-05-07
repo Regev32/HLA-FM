@@ -117,7 +117,7 @@ def run_epoch(mhc_encoder, projectors, task_data, split, device, optimizer=None)
 
             for td, batch_idx in zip(task_data, batch_tuple):
                 n_mhc    = td["mhc_tokens"].shape[0]
-                mhc_emb  = F.normalize(mhc_encoder(td["mhc_tokens"].to(device)), dim=-1)
+                mhc_emb  = F.normalize(mhc_encoder(td["mhc_tokens"]), dim=-1)
                 q_emb    = F.normalize(
                     projectors[td["task"].name](td["embs"][batch_idx].to(device)), dim=-1
                 )
@@ -365,7 +365,8 @@ def run(tasks: list):
 
         embs = task.encode_queries(query_list)
         embs = _to_device_if_fits(embs, device, task.name)
-        _save_test_split(task, mhc_tokens, query_list, test_idx, test_pos)
+        mhc_tokens = mhc_tokens.to(device)
+        _save_test_split(task, mhc_tokens.cpu(), query_list, test_idx, test_pos)
 
         task_data.append({
             "task":      task,

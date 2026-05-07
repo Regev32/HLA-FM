@@ -165,13 +165,12 @@ def evaluate(models: dict[str, str], tasks: list, device: str = None):
                 query_pos.setdefault(q_j, set()).add(mhc_i)
 
         task_test_data[task.name] = {
-            "mhc_tokens": mhc_tokens,
+            "mhc_tokens": mhc_tokens.to(device),
             "test_embs":  test_embs,
             "query_pos":  query_pos,
             "batch_size": task.batch_size,
         }
 
-    k_values = CFG["eval_k_values"]
     # task_name → model_name → metrics
     all_results = {task.name: {} for task in tasks}
 
@@ -185,9 +184,10 @@ def evaluate(models: dict[str, str], tasks: list, device: str = None):
             test_embs  = td["test_embs"]
             query_pos  = td["query_pos"]
             bs         = td["batch_size"]
+            k_values   = task.get_eval_k_values()
 
             with torch.no_grad():
-                mhc_emb = F.normalize(encoder(mhc_tokens.to(device)), dim=-1)
+                mhc_emb = F.normalize(encoder(mhc_tokens), dim=-1)
 
             n_test = test_embs.shape[0]
             scores = torch.zeros(n_test, mhc_tokens.shape[0])
@@ -202,7 +202,8 @@ def evaluate(models: dict[str, str], tasks: list, device: str = None):
 
     os.makedirs(TASK_RESULTS_DIR, exist_ok=True)
     for task in tasks:
-        results = all_results[task.name]
+        results  = all_results[task.name]
+        k_values = task.get_eval_k_values()
         _save_bar_plot(results, k_values, metric="recall",
                        title=f"Recall@K — {task.name}",
                        ylabel="Mean Recall",
